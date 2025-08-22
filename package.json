@@ -1,0 +1,31 @@
+{
+  "name": "bybit-leverage-calculator",
+  "version": "0.1.0",
+  "private": false,
+  "license": "MIT",
+  "author": "Bybit Leverage Calculator Contributors",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/your-username/bybit-leverage-calculator.git"
+  },
+  "keywords": ["bybit", "leverage", "calculator", "crypto", "trading", "perpetual"],
+  "type": "module",
+  "dependencies": {
+    "lucide-react": "^0.541.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.12",
+    "@tailwindcss/vite": "^4.1.12",
+    "@vitejs/plugin-react": "^5.0.1",
+    "autoprefixer": "^10.4.21",
+    "tailwindcss": "^4.1.12",
+    "vite": "^7.1.3"
+  }
+}
