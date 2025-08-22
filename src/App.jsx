@@ -899,6 +899,54 @@ const BybitLeverageCalculator = () => {
           </>
         )}
       </div>
+
+      {/* Footer with Disclaimers */}
+      <footer className="mt-12 py-8 border-t border-gray-700/50">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <div className="text-center space-y-4">
+            {/* Main Disclaimer */}
+            <div className="bg-gray-900/50 rounded-lg p-6 border border-gray-700/30">
+              <h3 className="text-md font-semibold text-yellow-400 mb-3 flex items-center justify-center gap-2">
+                ⚠️ Important Disclaimer
+              </h3>
+              <div className="text-sm text-gray-300 space-y-2 leading-relaxed">
+                <p>
+                  <strong className="text-gray-200">Not Financial Advice:</strong> This calculator is for educational and informational purposes only. 
+                  It does not constitute financial, investment, or trading advice. Always consult with qualified financial professionals 
+                  before making investment decisions.
+                </p>
+                <p>
+                  <strong className="text-gray-200">Trading Risks:</strong> Cryptocurrency trading involves substantial risk and may result in significant losses. 
+                  Leverage trading amplifies both potential profits and losses. Never trade with funds you cannot afford to lose.
+                </p>
+                <p>
+                  <strong className="text-gray-200">No Affiliation:</strong> This tool is not affiliated with, endorsed by, or connected to Bybit, 
+                  any cryptocurrency exchanges, or blockchain projects. All trademarks belong to their respective owners.
+                </p>
+              </div>
+            </div>
+
+            {/* Additional Legal Info */}
+            <div className="text-xs text-gray-500 space-y-2">
+              <p>
+                Calculations are estimates based on current market data and may not reflect actual trading results. 
+                Market conditions, fees, and slippage may affect actual outcomes.
+              </p>
+              <p>
+                © 2025 Bybit Leverage Calculator • Open Source (MIT License) • 
+                <a 
+                  href="https://github.com/marcosfreitas/bybit-leverage-calculator" 
+                  className="text-cyan-400 hover:text-cyan-300 ml-1"
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                >
+                  View Source Code
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
