@@ -249,52 +249,74 @@ const BybitLeverageCalculator = () => {
     const pairFromURL = params.get('pair');
     
     if (pairFromURL) {
-      // Find and select the pair from URL
+      // Find and select the pair from URL (search both linear and inverse)
       const searchPair = async () => {
         try {
-          const response = await fetch('https://api.bybit.com/v5/market/instruments-info?category=linear');
-          const data = await response.json();
-          
-          if (data.retCode === 0 && data.result?.list) {
-            const foundPair = data.result.list.find(item => 
-              item.symbol === pairFromURL && 
-              item.status === 'Trading' && 
-              item.leverageFilter
-            );
-            
-            if (foundPair) {
-              const pairObj = {
-                symbol: foundPair.symbol,
-                baseSymbol: foundPair.symbol,
-                category: 'linear',
-                categoryLabel: 'USDT Perpetual',
-                minLeverage: parseFloat(foundPair.leverageFilter?.minLeverage || '1'),
-                maxLeverage: parseFloat(foundPair.leverageFilter?.maxLeverage || '100')
-              };
+          // Search both categories like in the regular search
+          const categories = ['linear', 'inverse'];
+          const searchPromises = categories.map(category => 
+            fetch(`https://api.bybit.com/v5/market/instruments-info?category=${category}`)
+              .then(res => res.json())
+              .then(data => ({ category, data }))
+              .catch(err => ({ category, error: err }))
+          );
+
+          const results = await Promise.all(searchPromises);
+          let foundPair = null;
+          let foundCategory = null;
+
+          // Search through both categories
+          for (const { category, data, error } of results) {
+            if (!error && data?.retCode === 0 && data?.result?.list) {
+              const pair = data.result.list.find(item => 
+                item.symbol === pairFromURL && 
+                item.status === 'Trading' && 
+                item.leverageFilter &&
+                parseFloat(item.leverageFilter.maxLeverage) > 1
+              );
               
-              // Restore all state from URL
-              setSelectedPair(pairObj);
-              setLeverageInfo({ min: pairObj.minLeverage, max: pairObj.maxLeverage });
-              
-              const urlPosition = params.get('position');
-              if (urlPosition) setPositionType(urlPosition);
-              
-              const urlLeverage = params.get('leverage');
-              if (urlLeverage) setLeverage(parseFloat(urlLeverage));
-              
-              const urlEntry = params.get('entry');
-              if (urlEntry) setEntryAmount(urlEntry);
-              
-              const urlTargets = {
-                target1: params.get('t1') || '',
-                target2: params.get('t2') || '',
-                target3: params.get('t3') || ''
-              };
-              setTargets(urlTargets);
-              
-              // Fetch current price and start monitoring
-              setIsLivePriceActive(true);
+              if (pair) {
+                foundPair = pair;
+                foundCategory = category;
+                break;
+              }
             }
+          }
+          
+          if (foundPair && foundCategory) {
+            const pairObj = {
+              symbol: foundCategory === 'linear' ? foundPair.symbol : foundPair.symbol + '.I',
+              baseSymbol: foundPair.symbol,
+              category: foundCategory,
+              categoryLabel: foundCategory === 'linear' ? 'USDT Perpetual' : 'Inverse Perpetual',
+              minLeverage: parseFloat(foundPair.leverageFilter?.minLeverage || '1'),
+              maxLeverage: parseFloat(foundPair.leverageFilter?.maxLeverage || '100')
+            };
+            
+            // Restore all state from URL
+            setSelectedPair(pairObj);
+            setLeverageInfo({ min: pairObj.minLeverage, max: pairObj.maxLeverage });
+            
+            const urlPosition = params.get('position');
+            if (urlPosition) setPositionType(urlPosition);
+            
+            const urlLeverage = params.get('leverage');
+            if (urlLeverage) setLeverage(parseFloat(urlLeverage));
+            
+            const urlEntry = params.get('entry');
+            if (urlEntry) setEntryAmount(urlEntry);
+            
+            const urlTargets = {
+              target1: params.get('t1') || '',
+              target2: params.get('t2') || '',
+              target3: params.get('t3') || ''
+            };
+            setTargets(urlTargets);
+            
+            // Fetch current price and start monitoring
+            setIsLivePriceActive(true);
+          } else {
+            console.warn(`Pair ${pairFromURL} not found in any category`);
           }
         } catch (error) {
           console.error('Error loading pair from URL:', error);
